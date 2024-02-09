@@ -1,0 +1,21 @@
+.score {
+  width: 200px;
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background-color: #c7365f;
+}
+
+.scoreTitle {
+  font-size: 1.5rem;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.currentScore {
+  font-size: 3rem;
+  color: #fff;
+}
