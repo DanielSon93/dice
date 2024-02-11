@@ -2,7 +2,7 @@
 
 .player {
   font-family: "Nunito Sans", sans-serif;
-  width: 50%;
+  width: 400px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -23,8 +23,10 @@
 .playerName {
   font-size: 3.8rem;
   color: #333;
-  margin-bottom: 1rem;
-  letter-spacing: 1px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  text-align: center;
 }
 
 .totalScore {

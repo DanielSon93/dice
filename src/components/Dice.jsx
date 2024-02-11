@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import styles from "./Dice.module.css";
 import Player from "./Player";
 import Button from "./Button";
+import AddPlayer from "./AddPlayer";
+import RemovePlayer from "./RemovePlayer";
 import { RiRefreshLine } from "react-icons/ri";
 import { IoDiceOutline } from "react-icons/io5";
 import { HiOutlineSave } from "react-icons/hi";
@@ -10,16 +12,24 @@ export default function Dice() {
   const [player, setPlayer] = useState(initPlayer);
   const [diceNumber, setDiceNumber] = useState(null);
 
+  // 다음 플레이어 인덱스 반환
+  const getNextPlayer = () => {
+    const nowPlayerIdx = player.findIndex((e) => e.isActive);
+    const nextPlayer = nowPlayerIdx === player.length - 1 ? 0 : nowPlayerIdx + 1;
+
+    return nextPlayer;
+  };
+
   // 주사위 굴리기
   const handleRollDice = () => {
     const randomNumber = Math.ceil(Math.random() * 6);
-
     setDiceNumber(randomNumber);
 
     if (randomNumber === 1 || randomNumber === 2) {
-      setDiceNumber(null);
+      const nextPlayer = getNextPlayer();
+
       setPlayer((prev) =>
-        prev.map((player) => {
+        prev.map((player, idx) => {
           if (player.isActive) {
             return {
               ...player,
@@ -29,7 +39,7 @@ export default function Dice() {
           } else {
             return {
               ...player,
-              isActive: true,
+              isActive: idx === nextPlayer ? true : false,
             };
           }
         })
@@ -47,10 +57,10 @@ export default function Dice() {
 
   // 주사위 멈추기
   const handleHold = () => {
-    setDiceNumber(null);
+    const nextPlayer = getNextPlayer();
 
     setPlayer((prev) =>
-      prev.map((player) => {
+      prev.map((player, idx) => {
         if (player.isActive) {
           return {
             ...player,
@@ -62,7 +72,7 @@ export default function Dice() {
         } else {
           return {
             ...player,
-            isActive: true,
+            isActive: idx === nextPlayer ? true : false,
           };
         }
       })
@@ -75,37 +85,75 @@ export default function Dice() {
     setPlayer(initPlayer);
   };
 
-  console.log(player[0].isWinner || player[1].isWinner);
+  // 플레이어 추가
+  const handleAddPlayer = () => {
+    const newPlayer = {
+      playerName: `PLAYER ${player.length + 1}`,
+      totalScore: 0,
+      currentScore: 0,
+      isActive: false,
+      isWinner: false,
+    };
+    setPlayer([...player, newPlayer]);
+  };
+
+  // 플레이어 제거
+  const handleRemovePlayer = () => {
+    if (player.length > 2) {
+      setPlayer((prev) => prev.filter((_, i) => player.length - 1 !== i));
+    }
+  };
+
+  // 플레이어 이름 변경
+  const handleNameChange = (e, idx) => {
+    const playerName = e.target.value;
+    setPlayer((prev) =>
+      prev.map((player, i) => (idx === i ? { ...player, playerName } : { ...player }))
+    );
+  };
 
   return (
     <main className={styles.main}>
-      <Player player={player[0]} />
-      <Player player={player[1]} />
-      <div className={`${styles.button} ${styles.btnNewGame}`} onClick={handleNewGame}>
-        <Button>
-          <RiRefreshLine />
-          <span>NEW GAME</span>
-        </Button>
+      {player.map((e, i) => (
+        <Player key={i} player={e} handleNameChange={handleNameChange} idx={i} />
+      ))}
+      <div className={styles.utilWrapper}>
+        <div className={`${styles.button} ${styles.btnNewGame}`} onClick={handleNewGame}>
+          <Button>
+            <RiRefreshLine />
+            <span>NEW GAME</span>
+          </Button>
+        </div>
+
+        {!player.some((e) => e.isWinner) && (
+          <div className={`${styles.button} ${styles.btnRollDice}`} onClick={handleRollDice}>
+            <Button>
+              <IoDiceOutline />
+              <span>ROLL DICE</span>
+            </Button>
+          </div>
+        )}
+
+        {!player.some((e) => e.isWinner) && (
+          <div className={`${styles.button} ${styles.btnHold}`} onClick={handleHold}>
+            <Button>
+              <HiOutlineSave />
+              <span>HOLD</span>
+            </Button>
+          </div>
+        )}
+
+        {diceNumber && (
+          <div className={styles.diceShape}>
+            <img src={`https://pig-game-v2.netlify.app/dice-${diceNumber}.png`} alt="dice" />
+          </div>
+        )}
       </div>
-      {!(player[0].isWinner || player[1].isWinner) && (
-        <div className={`${styles.button} ${styles.btnRollDice}`} onClick={handleRollDice}>
-          <Button>
-            <IoDiceOutline />
-            <span>ROLL DICE</span>
-          </Button>
-        </div>
-      )}
-      {!(player[0].isWinner || player[1].isWinner) && (
-        <div className={`${styles.button} ${styles.btnHold}`} onClick={handleHold}>
-          <Button>
-            <HiOutlineSave />
-            <span>HOLD</span>
-          </Button>
-        </div>
-      )}
-      {diceNumber && (
-        <div className={styles.diceShape}>
-          <img src={`https://pig-game-v2.netlify.app/dice-${diceNumber}.png`} alt="dice" />
+
+      {!diceNumber && (
+        <div className={styles.addPlayer}>
+          <AddPlayer handleAddPlayer={handleAddPlayer} />
+          <RemovePlayer handleRemovePlayer={handleRemovePlayer} />
         </div>
       )}
     </main>

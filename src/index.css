@@ -10,10 +10,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   display: flex;
   align-items: center;
-  justify-content: center;
   width: 100vw;
   height: 100vh;
-  background-image: linear-gradient(to top left, #753682 0%, #bf2e34 100%);
+  background-color: purple;
+  padding: 0 5rem;
+  overflow-y: hidden;
 }
 
 code {
