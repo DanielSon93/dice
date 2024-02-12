@@ -4,9 +4,29 @@ import Player from "./Player";
 import Button from "./Button";
 import AddPlayer from "./AddPlayer";
 import RemovePlayer from "./RemovePlayer";
+import ReactDOM from "react-dom";
 import { RiRefreshLine } from "react-icons/ri";
 import { IoDiceOutline } from "react-icons/io5";
 import { HiOutlineSave } from "react-icons/hi";
+
+const Backdrop = ({ player }) => {
+  return player.some((e) => e.isWinner) && <div className={styles.backdrop}></div>;
+};
+
+const ModalOverlay = ({ player }) => {
+  const playerSort = JSON.parse(JSON.stringify(player)).sort((a, b) => b.totalScore - a.totalScore);
+  return (
+    playerSort.some((e) => e.isWinner) && (
+      <ol className={styles.modal}>
+        {playerSort.map((e) => (
+          <li>
+            {e.playerName} / {e.totalScore}
+          </li>
+        ))}
+      </ol>
+    )
+  );
+};
 
 export default function Dice() {
   const [player, setPlayer] = useState(initPlayer);
@@ -126,7 +146,7 @@ export default function Dice() {
         </div>
 
         {!player.some((e) => e.isWinner) && (
-          <div className={`${styles.button} ${styles.btnRollDice}`} onClick={handleRollDice}>
+          <div className={styles.button} onClick={handleRollDice}>
             <Button>
               <IoDiceOutline />
               <span>ROLL DICE</span>
@@ -155,6 +175,16 @@ export default function Dice() {
           <AddPlayer handleAddPlayer={handleAddPlayer} />
           <RemovePlayer handleRemovePlayer={handleRemovePlayer} />
         </div>
+      )}
+
+      {ReactDOM.createPortal(
+        <Backdrop player={player} />,
+        document.getElementById("backdrop-root")
+      )}
+
+      {ReactDOM.createPortal(
+        <ModalOverlay player={player} />,
+        document.getElementById("overlay-root")
       )}
     </main>
   );

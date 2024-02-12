@@ -15,7 +15,6 @@ export default function Player({ player, handleNameChange, idx }) {
         onChange={(e) => handleNameChange(e, idx)}
       />
       <div className={styles.totalScore}>{player.totalScore}</div>
-      {player.isWinner && <div className={styles.winnerText}>You Win!!!</div>}
       <Score currentScore={player.currentScore} />
     </section>
   );
